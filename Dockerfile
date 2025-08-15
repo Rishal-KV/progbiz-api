@@ -5,17 +5,20 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install -g bun
+# Install Bun properly
+RUN curl -fsSL https://bun.sh/install | bash \
+    && export PATH="/root/.bun/bin:$PATH"
 
-RUN bun install
+# Install dependencies
+RUN /root/.bun/bin/bun install
 
 # Copy source code
 COPY . .
 
 EXPOSE 8000
 
-# Use nodemon for development
-CMD ["bun", "run", "dev"]
+# Use Bun for development
+CMD ["/root/.bun/bin/bun", "run", "dev"]
 
 # Production stage
 FROM node:20-alpine AS production
@@ -25,15 +28,16 @@ WORKDIR /usr/src/app
 # Copy package files
 COPY package*.json ./
 
-# Install bun
-RUN npm install -g bun
+# Install Bun properly
+RUN curl -fsSL https://bun.sh/install | bash \
+    && export PATH="/root/.bun/bin:$PATH"
 
-# Install production dependencies only
-RUN bun install --production
+# Install only production dependencies
+RUN /root/.bun/bin/bun install --production
 
 # Copy built files from development stage
 COPY --from=development /usr/src/app/dist ./dist
 
 EXPOSE 8000
 
-CMD ["bun", "run", "start"]
+CMD ["/root/.bun/bin/bun", "run", "start"]
