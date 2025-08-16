@@ -18,8 +18,8 @@ app.use(compression());
 
 app.use(
   cors({
-    origin: "*",
-    credentials: false,
+    origin: "https://progbiz-seven.vercel.app",
+    credentials: true,
   })
 );
 
