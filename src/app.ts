@@ -7,7 +7,7 @@ import apiRoutes from "./api";
 import { connectToMongoDB } from "./config/database";
 import { ENV } from "./config/env";
 import { HTTP } from "./config/http-status.config";
-import { allowedOrigins } from "./config/origins.config";
+// import { allowedOrigins } from "./config/origins.config";
 import { errorHandler } from "./middleware/error.middleware";
 import logger from "./utils/logger.util";
 
@@ -15,20 +15,10 @@ const app: Express = express();
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "https://progbiz-seven.vercel.app",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.options("*", cors()); // important for preflight
 app.use(helmet());
 app.use(compression());
 app.options("*", cors());
