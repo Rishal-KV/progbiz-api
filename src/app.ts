@@ -18,7 +18,7 @@ app.use(compression());
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: "*",
     credentials: true,
   })
 );
