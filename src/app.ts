@@ -13,15 +13,14 @@ import logger from "./utils/logger.util";
 
 const app: Express = express();
 
-app.use(helmet());
-app.use(compression());
-
 app.use(
   cors({
     origin: allowedOrigins,
     credentials: true,
   })
 );
+app.use(helmet());
+app.use(compression());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
