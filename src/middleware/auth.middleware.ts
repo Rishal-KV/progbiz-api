@@ -47,7 +47,7 @@ export const protect = async (
         });
       }
       req.user = user;
-      req.userType = user.role;
+      // req.userType = user.role;
 
       next();
     } catch (_error) {
