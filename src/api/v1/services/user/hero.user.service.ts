@@ -7,7 +7,11 @@ export class HeroUserService {
 
   async getAllHeros(): Promise<ServiceResponse<IHero[]>> {
     try {
-      const heros = await this.heroModel.find().sort({ createdAt: -1 });
+      const heros = await this.heroModel
+        .find({
+          status: "active",
+        })
+        .sort({ createdAt: -1 });
       return {
         status: HTTP.OK,
         success: true,

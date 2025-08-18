@@ -53,7 +53,7 @@ export const ENV = {
     apiPrefix: process.env.API_PREFIX || "/api",
     apiVersion: process.env.API_VERSION || "v1",
     companyName: process.env.COMPANY_NAME || "Social Notch",
-    userUrl: process.env.UI_URL || "http://localhost:3000",
+    userUrl: process.env.UI_URL || "",
     adminUrl: process.env.ADMIN_URL || "http://localhost:3001",
     vendorUrl: process.env.VENDOR_URK || "http://localhost:3002",
   },

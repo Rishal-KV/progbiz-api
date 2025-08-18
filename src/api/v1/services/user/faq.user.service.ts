@@ -7,7 +7,11 @@ export class FaqUserService {
 
   async getAllFaqs(): Promise<ServiceResponse<IFaq[]>> {
     try {
-      const faqs = await this.faqModel.find().sort({ createdAt: -1 });
+      const faqs = await this.faqModel
+        .find({
+          status: "active",
+        })
+        .sort({ createdAt: -1 });
       return {
         status: HTTP.OK,
         success: true,

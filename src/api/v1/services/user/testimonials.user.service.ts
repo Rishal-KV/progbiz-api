@@ -12,7 +12,9 @@ export class TestimonialUserService {
   async getAllTestimonials(): Promise<ServiceResponse<ITestimonial[]>> {
     try {
       const testimonials = await this.testimonialModel
-        .find()
+        .find({
+          status: "active",
+        })
         .sort({ createdAt: -1 });
       return {
         status: HTTP.OK,

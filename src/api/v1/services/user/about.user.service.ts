@@ -8,7 +8,11 @@ export class AboutUserService {
 
   async getAllAbouts(): Promise<ServiceResponse<IAbout[]>> {
     try {
-      const abouts = await this.aboutModel.find().sort({ createdAt: -1 });
+      const abouts = await this.aboutModel
+        .find({
+          status: "active",
+        })
+        .sort({ createdAt: -1 });
       return {
         status: HTTP.OK,
         success: true,

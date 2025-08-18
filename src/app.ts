@@ -52,7 +52,7 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(morgan("dev"));
 
 // Debug middleware (remove in production)
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   console.log(`${req.method} request from origin: ${req.headers.origin}`);
   console.log("Allowed origins:", allowedOrigins);
   next();
