@@ -13,82 +13,38 @@ import logger from "./utils/logger.util";
 
 const app: Express = express();
 
-// CORS configuration
-const corsOptions = {
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "X-Requested-With",
-    "Accept",
-    "Origin",
-  ],
-  exposedHeaders: ["Content-Length", "X-Foo", "X-Bar"],
-  optionsSuccessStatus: 200, // Some legacy browsers choke on 204
-  preflightContinue: false,
-};
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
-
-// Security and compression middleware
-app.use(
-  helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
-);
+app.use(helmet());
 app.use(compression());
 
-// Body parsing middleware
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
-// Logging middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Debug middleware (remove in production)
-app.use((req, _res, next) => {
-  console.log(`${req.method} request from origin: ${req.headers.origin}`);
-  console.log("Allowed origins:", allowedOrigins);
-  next();
-});
+app.use("/api", apiRoutes);
 
-// Health check route (before API routes)
 app.get("/health", (_req, res) => {
   res
     .status(HTTP.OK)
     .json({ status: "UP", message: "Server is up and kicking." });
 });
 
-// API routes
-app.use("/api", apiRoutes);
-
-// Catch-all route for unmatched routes
-app.all("*", (req, res) => {
-  res
-    .status(HTTP.NOT_FOUND)
-    .json({ message: `Route ${req.originalUrl} not found` });
-});
-
-// Error handling middleware (must be last)
 app.use(errorHandler);
 
 const startServer = async (): Promise<void> => {
   try {
     await connectToMongoDB();
 
-    const port = ENV.app.port || 5000;
-
-    app.listen(port, () => {
+    app.listen(ENV.app.port, () => {
       logger.info(
-        `🚀 Server running in ${ENV.app.nodeEnv} mode on port ${port}`
+        `🚀 Server running in ${ENV.app.nodeEnv} mode on port ${ENV.app.port}`
       );
-      logger.info(`📋 Allowed origins: ${JSON.stringify(allowedOrigins)}`);
     });
   } catch (error) {
     logger.error("Failed to start server:", error);
@@ -96,7 +52,6 @@ const startServer = async (): Promise<void> => {
   }
 };
 
-// Global error handlers
 process.on("uncaughtException", (error) => {
   logger.error("Uncaught Exception:", error);
   process.exit(1);
@@ -107,7 +62,4 @@ process.on("unhandledRejection", (reason, promise) => {
   process.exit(1);
 });
 
-// Start the server
 startServer();
-
-export default app;
