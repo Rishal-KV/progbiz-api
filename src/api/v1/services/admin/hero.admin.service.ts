@@ -72,24 +72,29 @@ export class HeroAdminService {
   async updateHero(
     slug: string,
     hero: IHero,
-    file: Express.Multer.File
+    file?: Express.Multer.File
   ): Promise<ServiceResponse<IHero>> {
     try {
+      const updateData: Partial<IHero> = {
+        ...hero,
+      };
+      console.log({ file });
+      // ✅ Only update image if a new file is uploaded
+      if (file) {
+        updateData.image = {
+          public_id: file.filename,
+          secure_url: file.path,
+        };
+      }
+
       const updatedHero = await this.heroModel.findOneAndUpdate(
         { slug },
-        {
-          ...hero,
-          image: {
-            public_id: file?.filename,
-            secure_url: file?.path,
-          },
-        },
-        {
-          new: true,
-        }
+        updateData,
+        { new: true }
       );
 
-      if (hero.oldImagePublicId) {
+      // ✅ Delete old image only if new one was uploaded
+      if (file && hero.oldImagePublicId) {
         await deleteImageFromCloudinary(hero.oldImagePublicId).catch(
           (error) => {
             console.log(error);
@@ -98,6 +103,7 @@ export class HeroAdminService {
       }
 
       if (!updatedHero) throw new AppError("Hero not found", HTTP.NOT_FOUND);
+
       return {
         status: HTTP.OK,
         success: true,
@@ -106,7 +112,6 @@ export class HeroAdminService {
       };
     } catch (error) {
       if (error instanceof AppError) throw error;
-
       throw new AppError((error as Error).message, HTTP.INTERNAL_SERVER_ERROR);
     }
   }
